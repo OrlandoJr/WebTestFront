@@ -1,0 +1,23 @@
+﻿@page "/Clientes/Create"
+
+@inject NavigationManager navigator
+@inject HttpClient http
+
+<h3>Cadastrar Clientes</h3>
+
+<hr />
+
+<FormClientes cliente="cliente" ButtonText="Adicionar" OnValidSubmit="CriarClientes" />
+
+@code {
+
+    ClientesViewModel cliente = new ClientesViewModel();
+
+    private async Task CriarClientes()
+    {
+        await http.PostAsJsonAsync("api/Clientes/Post", cliente);
+        navigator.NavigateTo("Clientes/Index");
+    }
+
+
+}

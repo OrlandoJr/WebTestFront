@@ -1,0 +1,39 @@
+﻿@page "/Clientes/Edit/{Id:int}"
+
+@inject NavigationManager navigator
+@inject HttpClient http
+
+<h3>Editar Clientes</h3>
+
+<hr />
+
+<FormClientes cliente="cliente" ButtonText="Editar" OnValidSubmit="EditarClientes" />
+
+@code {
+
+    [Parameter]
+    public ClientesViewModel cliente { get; set; }
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+
+        cliente = await http.GetFromJsonAsync<ClientesViewModel>($"api/Clientes/GetById/{Id}");
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await OnParametersSetAsync();
+
+    }
+
+    private async Task EditarClientes()
+    {
+        await http.PutAsJsonAsync("api/Clientes", cliente);
+        navigator.NavigateTo("Clientes/Index");
+    }
+
+}

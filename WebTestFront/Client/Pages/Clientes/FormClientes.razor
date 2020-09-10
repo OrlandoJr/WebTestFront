@@ -1,0 +1,101 @@
+﻿
+
+<EditForm Model="@cliente" OnValidSubmit="@OnValidSubmit">
+    <DataAnnotationsValidator />
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="control-label">Nome</label>
+                <InputText @bind-Value="cliente.Nome" class="form-control" />
+                <ValidationMessage For="(() => cliente.Nome)" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Data Nascimento</label>
+                <InputDate @bind-Value="cliente.Data_Nascimento" class="form-control" />
+                <ValidationMessage For="(() => cliente.Data_Nascimento)" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">RG</label>
+                <InputText @bind-Value="cliente.RG" class="form-control" />
+                <ValidationMessage For="(() => cliente.RG)" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">CPF</label>
+                <InputText @bind-Value="cliente.CPF" class="form-control" />
+                <ValidationMessage For="(() => cliente.CPF)" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Estado Civil</label>
+
+                <InputSelect ValueExpression="@(()=>cliente.Estado_Civil)"
+                             Value="cliente.Estado_Civil"
+                             ValueChanged="@( (string value) => OnValueChanged(value) )"
+                             class="form-control">
+                    <option value="">Selecione Estado Civil</option>
+                    @foreach (var estadocivil in lstEstadoCivil)
+                    {
+                        <option value="@estadocivil">@estadocivil</option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="(() => cliente.Estado_Civil)" />
+            </div>
+
+            @if (visivel)
+            {
+                <div>
+                    <div class="form-group">
+                        <label class="control-label">Nome do Conjuge</label>
+                        <InputText @bind-Value="cliente.Nome_Parceiro" class="form-control" />
+                        <ValidationMessage For="(() => cliente.Nome_Parceiro)" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Data Nascimento Conjuge</label>
+                        <InputDate @bind-Value="cliente.Data_Nascimento_Parceiro" class="form-control" />
+                        <ValidationMessage For="(() => cliente.Data_Nascimento_Parceiro)" />
+                    </div>
+
+                </div>
+            }
+            <div class="form-group">
+                <input type="submit" value="@ButtonText" class="btn btn-primary" />
+            </div>
+
+        </div>
+    </div>
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public ClientesViewModel cliente { get; set; }
+
+
+    [Parameter]
+    public string ButtonText { get; set; }
+
+    [Parameter]
+    public EventCallback OnValidSubmit { get; set; }
+
+    bool visivel = false;
+
+    List<string> lstEstadoCivil = new List<string>()
+    {
+        "Solteiro",
+        "Casado",
+        "Viuvo"
+    };
+
+    private Task OnValueChanged(string value)
+    {
+
+
+        visivel = (value == "Solteiro" || string.IsNullOrEmpty(value)) ? false : true;
+
+        cliente.Estado_Civil = string.IsNullOrEmpty(value) ? "Solteiro" : value;
+
+        return Task.CompletedTask;
+    }
+
+
+}

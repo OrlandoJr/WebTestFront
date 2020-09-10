@@ -1,0 +1,83 @@
+﻿@page "/Clientes/Delete/{Id:int}"
+
+@inject NavigationManager navigator
+@inject HttpClient http
+
+<h3>Deletar Clientes</h3>
+
+<hr />
+
+<EditForm Model="@cliente" OnValidSubmit="DeletarClientes">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="control-label">Nome</label>
+                <label class="control-label">@cliente.Nome</label>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Data Nascimento</label>
+                <label class="control-label">@string.Format("{0:dd/MM/yyyy}", @cliente.Data_Nascimento)</label>
+            </div>
+            <div class="form-group">
+                <label class="control-label">RG</label>
+                <label class="control-label">@cliente.RG</label>
+            </div>
+            <div class="form-group">
+                <label class="control-label">CPF</label>
+                <label class="control-label">@cliente.CPF</label>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Estado Civil</label>
+                <label class="control-label">@cliente.Estado_Civil </label>
+            </div>
+
+            @if (@cliente.Estado_Civil != "Solteiro")
+            {
+                <div>
+                    <div class="form-group">
+                        <label class="control-label">Nome do Conjuge</label>
+                        <label class="control-label">@cliente.Nome_Parceiro</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Data Nascimento Conjuge</label>
+                        <label class="control-label">@string.Format("{0:dd/MM/yyyy}", @cliente.Data_Nascimento_Parceiro)</label>
+                    </div>
+
+                </div>
+            }
+            <div class="form-group">
+                <input type="submit" value="Deletar" class="btn btn-danger" />
+            </div>
+
+        </div>
+    </div>
+</EditForm>
+    @code {
+
+        [Parameter]
+        public ClientesViewModel cliente { get; set; }
+
+        [Parameter]
+        public int Id { get; set; }
+
+        protected override async Task OnParametersSetAsync()
+        {
+
+            cliente = await http.GetFromJsonAsync<ClientesViewModel>($"api/Clientes/GetById/{Id}");
+
+        }
+
+        protected override async Task OnInitializedAsync()
+        {
+            await OnParametersSetAsync();
+
+        }
+
+        private async Task DeletarClientes()
+        {
+            await http.DeleteAsync($"api/Clientes/{Id}");
+            navigator.NavigateTo("Clientes/Index");
+        }
+
+    }

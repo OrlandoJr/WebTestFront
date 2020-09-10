@@ -1,0 +1,181 @@
+﻿@page "/Clientes/Index"
+@page "/Clientes"
+@inject HttpClient http
+
+<h3>Index Cliente</h3>
+
+<div>
+    <a href="Clientes/Create" class="btn btn-light">Criar Novo</a>
+</div>
+
+<div class="uk-margin">
+    <div class="uk-inline uk-width-1-1">
+        <button class="uk-form-icon uk-form-icon-flip" uk-icon="icon: search"  @onclick="@Search" ></button>
+        <input class="uk-input uk-form-large uk-width-1-1" placeholder="Pesquisar por Nome" @bind="Nome" />
+    </div>
+</div>
+
+<div>
+    @if (clientes == null)
+    {
+        <Text>Carregando .....</Text>
+    }
+    else if (clientes.Count == 0)
+    {
+        <Text>Não há clientes para mostrar</Text>
+    }
+
+    else
+    {
+
+        <MatTable Items="@clientes" Class="mat-elevation-z5" AllowSelection="true" Style="zoom:80%">
+            <MatTableHeader>
+             
+                    <th>
+                        Cod
+                    </th>
+                    <th>
+                        Nome
+                    </th>
+                    <th>
+                        Nascimento
+                    </th>
+                    <th>
+                        Estado Civil
+                    </th>
+                    <th>
+                        Nome Conjuge
+                    </th>
+                    <th>
+                        Nascimento Conjuge
+                    </th>
+
+                    <th></th>
+              
+            </MatTableHeader>
+            <MatTableRow>
+     
+                    <td>
+                        @context.ClienteID
+                    </td>
+                    <td>
+                        @context.Nome
+                    </td>
+                    <td>
+                        @string.Format("{0:dd/MM/yyyy}", context.Data_Nascimento)
+                    </td>
+                    <td>
+                        @context.Estado_Civil
+                    </td>
+                    <td>
+                        @context.Nome_Parceiro
+                    </td>
+                    <td>
+                        @string.Format("{0:dd/MM/yyyy}", context.Data_Nascimento_Parceiro)
+                    </td>
+
+                    <td style="width:17%">
+                        <a class="btn btn-success" href="clientes/Edit/@context.ClienteID">Editar</a> |
+                        <a class="btn btn-danger" href="clientes/Delete/@context.ClienteID">Deletar</a>
+                    </td>
+
+            </MatTableRow>
+        </MatTable>
+
+        @*<table class="table" style="zoom:80%">
+                <thead>
+                    <tr>
+                        <th>
+                            Cod
+                        </th>
+                        <th>
+                            Nome
+                        </th>
+                        <th>
+                            Nascimento
+                        </th>
+                        <th>
+                            Estado Civil
+                        </th>
+                        <th>
+                            Nome Conjuge
+                        </th>
+                        <th>
+                            Nascimento Conjuge
+                        </th>
+
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in clientes)
+                    {
+                    <tr>
+                        <td>
+                            @item.ClienteID
+                        </td>
+                        <td>
+                            @item.Nome
+                        </td>
+                        <td>
+                            @string.Format("{0:dd/MM/yyyy}", item.Data_Nascimento)
+                        </td>
+                        <td>
+                            @item.Estado_Civil
+                        </td>
+                        <td>
+                            @item.Nome_Parceiro
+                        </td>
+                        <td>
+                            @string.Format("{0:dd/MM/yyyy}",item.Data_Nascimento_Parceiro)
+                        </td>
+
+                        <td>
+                            <a class="btn btn-success" href="clientes/Edit/@item.ClienteID">Editar</a> |
+                            <a class="btn btn-danger" href="clientes/Delete/@item.ClienteID">Deletar</a>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>*@
+    }
+</div>
+
+@code {
+
+    List<ClientesViewModel> clientes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load();
+
+    }
+
+    [Parameter]
+    public string Nome { get; set; }
+
+    private async Task Search()
+    {
+
+        if (string.IsNullOrEmpty(Nome))
+        {
+            clientes = await http.GetFromJsonAsync<List<ClientesViewModel>>("api/Clientes/GetAll");
+        }
+
+        if (Nome.Length >= 3)
+        {
+            string path = $"api/Clientes/GetByName/{Nome}";
+            clientes = await http.GetFromJsonAsync<List<ClientesViewModel>>(path);
+        }
+
+
+
+        Nome = null;
+    }
+
+    private async Task Load()
+    {
+        clientes = await http.GetFromJsonAsync<List<ClientesViewModel>>("api/Clientes/GetAll");
+    }
+
+}
